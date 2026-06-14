@@ -395,8 +395,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <span class="err-msg">Ingresa un correo válido</span>
           </div>
           <div class="field">
-            <label>Teléfono de contacto</label>
-            <input type="tel" id="f_telefono" placeholder="300 000 0000">
+            <label>Celular de contacto <span style="font-size:11px;color:var(--g400);font-weight:400">(opcional)</span></label>
+            <input type="tel" id="f_telefono" placeholder="300 000 0000" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <span class="err-msg">Ingresa un celular colombiano válido (10 dígitos, empieza por 3)</span>
           </div>
         </div>
       </div>
@@ -748,7 +749,7 @@ function prevStep(){if(curStep>1)gotoStep(curStep-1);}
 
 /* ── VALIDACIÓN ── */
 const REQUIRED={
-  1:['f_fecha','f_nombre','f_area','f_responsable','f_cargo','f_correo'],
+  1:['f_fecha','f_nombre','f_area','f_responsable','f_cargo','f_correo','f_telefono'],
   2:['f_situacion','f_descripcion'],
   3:['f_justificacion'],
   4:['f_obj_general'],
@@ -771,11 +772,14 @@ function validate(n){
     if(!el)return;
     const empty=!el.value.trim();
     const badEmail=id==='f_correo'&&el.value.trim()&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
-    if(empty||badEmail){
+    const badTel=id==='f_telefono'&&el.value.trim()&&!/^3[0-9]{9}$/.test(el.value.trim());
+    const isOptional=id==='f_telefono';
+    if((empty&&!isOptional)||badEmail||badTel){
       if(w)w.classList.add('field-error');
       errors.push(id);
       const clean=()=>{
-        const ok=el.value.trim()&&!(id==='f_correo'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()));
+        const isOpt=id==='f_telefono';
+        const ok=(el.value.trim()||isOpt)&&!(id==='f_correo'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()))&&!(id==='f_telefono'&&el.value.trim()&&!/^3[0-9]{9}$/.test(el.value.trim()));
         if(ok){if(w)w.classList.remove('field-error');el.removeEventListener('input',clean);el.removeEventListener('change',clean);}
       };
       el.addEventListener('input',clean);
@@ -1005,7 +1009,7 @@ function viewDetail(id){
   const row=(l,v)=>v?`<div class="drow"><span class="dlabel">${l}</span><span class="dval">${v}</span></div>`:'';
   const sec=(t,c)=>`<div class="detail-sec"><h4>${t}</h4>${c}</div>`;
   document.getElementById('modal-bd').innerHTML=
-    sec('Información General',row('Fecha',item.fecha)+row('Área',item.area)+row('Responsable',item.responsable)+row('Cargo',item.cargo)+row('Correo',item.correo)+row('Teléfono',item.telefono))+
+    sec('Información General',row('Fecha',item.fecha)+row('Área',item.area)+row('Responsable',item.responsable)+row('Cargo',item.cargo)+row('Correo',item.correo)+row('Celular',item.telefono))+
     sec('Descripción',row('Situación',item.situacion)+row('Origen',(item.origen||[]).join(', ')+(item.origen_otro?' / '+item.origen_otro:''))+row('Descripción',item.descripcion)+row('Tipo',(item.tipo||[]).join(', ')))+
     sec('Justificación y Beneficios',row('Justificación',item.justificacion)+row('Estudiantes',item.ben_est)+row('Docentes',item.ben_doc)+row('Familias',item.ben_fam)+row('Institución',item.ben_inst))+
     sec('Objetivos',row('Objetivo general',item.obj_general)+row('Objetivos específicos',(item.obj_especificos||'').replace(/\n/g,'<br>')))+
@@ -1037,7 +1041,7 @@ document.addEventListener('click',e=>{
 
 const COLS=[
   {key:'fecha',label:'Fecha'},{key:'nombre',label:'Nombre de la propuesta'},{key:'area',label:'Área o proceso'},
-  {key:'responsable',label:'Responsable'},{key:'cargo',label:'Cargo'},{key:'correo',label:'Correo'},{key:'telefono',label:'Teléfono'},
+  {key:'responsable',label:'Responsable'},{key:'cargo',label:'Cargo'},{key:'correo',label:'Correo'},{key:'telefono',label:'Celular'},
   {key:'situacion',label:'Situación / Necesidad'},{key:'origen',label:'Origen',arr:true},{key:'descripcion',label:'Descripción'},
   {key:'tipo',label:'Tipo de innovación',arr:true},{key:'justificacion',label:'Justificación'},
   {key:'ben_est',label:'Benef. Estudiantes'},{key:'ben_doc',label:'Benef. Docentes'},{key:'ben_fam',label:'Benef. Familias'},{key:'ben_inst',label:'Benef. Institución'},
@@ -1254,7 +1258,7 @@ function doExportXLS(){
     {key:'responsable',   label:'Responsable',            wch:22},
     {key:'cargo',         label:'Cargo',                  wch:20},
     {key:'correo',        label:'Correo',                 wch:32},
-    {key:'telefono',      label:'Teléfono',               wch:14},
+    {key:'telefono',      label:'Celular',                wch:14},
     {key:'tipo',          label:'Tipo de innovación',     wch:28,arr:true},
     {key:'niveles',       label:'Niveles impactados',     wch:26,arr:true},
     {key:'beneficiarios', label:'Beneficiarios',          wch:14},
