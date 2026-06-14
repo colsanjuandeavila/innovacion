@@ -692,8 +692,11 @@ const STEPS=7;
 
 /* ── SUPABASE ── */
 const SB_URL='https://outhobesotwdfwdxcdpp.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzgxNDQ3NTc5LCJleHAiOjIwOTY4MDc1Nzl9.r0SoWypegqjS_jhai6VkjUum2eCV2VTBQYqjKtUiSuU';
-const supa=supabase.createClient(SB_URL,SB_KEY);
+const SB_KEY='sb_publishable_DepJt3f6TKkSru1qzpZUlA_zLtxtQvY';
+const supa=supabase.createClient(SB_URL,SB_KEY,{
+  auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},
+  global:{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}}
+});
 
 /* Cache local para exportaciones y fallback */
 let _cache=[];
